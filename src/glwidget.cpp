@@ -561,19 +561,20 @@ void GLWidget::createThread(RenderThread **thread, thread_function_t function, v
     (*thread)->start();
 }
 
-static void onThreadCreate(mlt_properties owner, GLWidget* self, Mlt::EventData eventData)
+static void onThreadCreate(mlt_properties owner, GLWidget* self, mlt_event_data data)
 {
     Q_UNUSED(owner)
+    Mlt::EventData eventData(data);
     auto threadData = (mlt_event_data_thread*) eventData.get_other();
     auto renderThread = (RenderThread**) threadData->thread;
     self->createThread(renderThread, threadData->function, threadData->data);
 }
 
-static void onThreadJoin(mlt_properties owner, GLWidget* self, Mlt::EventData eventData)
+static void onThreadJoin(mlt_properties owner, GLWidget* self, mlt_event_data data)
 {
     Q_UNUSED(owner)
     Q_UNUSED(self)
-    auto thread = (RenderThread*) eventData.get_other();
+    auto thread = (RenderThread*) Mlt::EventData(data).get_other();
     if (thread) {
         thread->quit();
         thread->wait();
@@ -833,9 +834,9 @@ void GLWidget::updateTexture(GLuint yName, GLuint uName, GLuint vName)
 }
 
 // MLT consumer-frame-show event handler
-void GLWidget::on_frame_show(mlt_consumer, GLWidget* widget, Mlt::EventData data)
+void GLWidget::on_frame_show(mlt_consumer, GLWidget* widget, mlt_event_data data)
 {
-    auto frame = data.get_frame();
+    auto frame = Mlt::EventData(data).get_frame();
     if (frame.is_valid() && frame.get_int("rendered")) {
         int timeout = (widget->consumer()->get_int("real_time") > 0)? 0: 1000;
         if (widget->m_frameRenderer && widget->m_frameRenderer->semaphore()->tryAcquire(1, timeout)) {

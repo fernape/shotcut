@@ -150,7 +150,7 @@ private:
     bool m_scrubAudio;
     GLint m_maxTextureSize;
 
-    static void on_frame_show(mlt_consumer, GLWidget* widget, Mlt::EventData);
+    static void on_frame_show(mlt_consumer, GLWidget* widget, mlt_event_data);
 
 private slots:
     void initializeGL();
